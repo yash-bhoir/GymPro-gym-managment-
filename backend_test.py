@@ -112,7 +112,10 @@ class GymAPITester:
             self.log_test("OTP Verification", True, "Correctly rejected invalid OTP")
             return True
         else:
-            details = response.text if response else "Request failed"
+            status = response.status_code if response else "No response"
+            details = f"Expected 400 for invalid OTP, got {status}"
+            if response:
+                details += f" - {response.text}"
             self.log_test("OTP Verification", False, details)
             return False
 
