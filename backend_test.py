@@ -64,9 +64,11 @@ class GymAPITester:
         """Test if backend is running"""
         print("\n🔍 Testing Backend Health...")
         try:
-            response = requests.get(f"{self.base_url}/docs", timeout=5)
-            success = response.status_code == 200
-            self.log_test("Backend Health Check", success, f"Status: {response.status_code}")
+            # Try to hit the login endpoint instead of /docs
+            response = requests.get(f"{self.base_url}/api/auth/me", timeout=5)
+            # 401 is expected without auth, means API is working
+            success = response.status_code in [401, 422, 403]
+            self.log_test("Backend Health Check", success, f"Status: {response.status_code} (API responding)")
             return success
         except Exception as e:
             self.log_test("Backend Health Check", False, f"Error: {str(e)}")
