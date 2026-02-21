@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem } from '@mui/material'
+import { AppBar, Toolbar, Typography, IconButton, Box, Avatar, Menu, MenuItem, Chip } from '@mui/material'
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined'
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined'
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined'
@@ -7,6 +7,7 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
 
 const Topbar = ({ title, onMenuClick, mode, onToggleMode, admin, onLogout }) => {
   const [anchorEl, setAnchorEl] = React.useState(null)
+  const isSuperAdmin = admin?.role === 'super_admin'
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget)
@@ -23,13 +24,18 @@ const Topbar = ({ title, onMenuClick, mode, onToggleMode, admin, onLogout }) => 
 
   return (
     <AppBar position="sticky" elevation={0} sx={{ bgcolor: 'transparent', backdropFilter: 'blur(12px)' }}>
-      <Toolbar sx={{ gap: 2 }}>
+      <Toolbar sx={{ gap: 2, flexWrap: 'wrap' }}>
         <IconButton onClick={onMenuClick} sx={{ display: { md: 'none' } }} data-testid="mobile-menu-button">
           <MenuOutlinedIcon />
         </IconButton>
-        <Typography variant="h5" sx={{ flexGrow: 1 }} data-testid="page-title">
-          {title}
-        </Typography>
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="h5" data-testid="page-title">
+            {title}
+          </Typography>
+          {isSuperAdmin && (
+            <Chip label="Super Admin" size="small" color="secondary" sx={{ mt: 0.5 }} data-testid="topbar-super-admin-chip" />
+          )}
+        </Box>
         <IconButton onClick={onToggleMode} data-testid="theme-toggle-button">
           {mode === 'dark' ? <LightModeOutlinedIcon /> : <DarkModeOutlinedIcon />}
         </IconButton>
