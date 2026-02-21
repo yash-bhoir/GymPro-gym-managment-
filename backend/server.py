@@ -394,6 +394,30 @@ async def require_super_admin(current_user=Depends(get_current_user)):
     return current_user
 
 
+@app.get("/api/cloudinary/signature")
+async def get_cloudinary_signature(resource_type: str = "image", current_user=Depends(get_current_user)):
+    if resource_type not in ["image"]:
+        raise HTTPException(status_code=400, detail="Unsupported resource type")
+    if not CLOUDINARY_CLOUD_NAME or not CLOUDINARY_API_KEY or not CLOUDINARY_API_SECRET:
+        raise HTTPException(status_code=400, detail="Cloudinary not configured")
+
+    folder = f"members/{current_user['_id']}"
+    timestamp = int(time.time())
+    params = {
+        "timestamp": timestamp,
+        "folder": folder
+    }
+    signature = cloudinary.utils.api_sign_request(params, CLOUDINARY_API_SECRET)
+    return {
+        "signature": signature,
+        "timestamp": timestamp,
+        "cloud_name": CLOUDINARY_CLOUD_NAME,
+        "api_key": CLOUDINARY_API_KEY,
+        "folder": folder,
+        "resource_type": resource_type
+    }
+
+
 def record_login_attempt(email: str):
     now = datetime.utcnow()
     attempts = LOGIN_ATTEMPTS.get(email, [])
