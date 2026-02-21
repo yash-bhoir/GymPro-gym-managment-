@@ -142,9 +142,9 @@ const SuperAdmins = () => {
                   <Typography variant="h6" data-testid={`super-admin-name-${admin.id}`}>{admin.full_name}</Typography>
                   <Typography variant="body2" color="text.secondary" data-testid={`super-admin-email-${admin.id}`}>{admin.email}</Typography>
                   <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap' }}>
-                    <Chip label={`Members: ${admin.members_count || 0}`} size="small" />
-                    <Chip label={admin.verified ? 'Verified' : 'Pending'} color={admin.verified ? 'success' : 'warning'} size="small" />
-                    <Chip label={admin.disabled ? 'Disabled' : 'Active'} color={admin.disabled ? 'error' : 'info'} size="small" />
+                    <Chip label={`Members: ${admin.members_count || 0}`} size="small" data-testid={`super-admin-members-${admin.id}`} />
+                    <Chip label={admin.verified ? 'Verified' : 'Pending'} color={admin.verified ? 'success' : 'warning'} size="small" data-testid={`super-admin-verified-${admin.id}`} />
+                    <Chip label={admin.disabled ? 'Disabled' : 'Active'} color={admin.disabled ? 'error' : 'info'} size="small" data-testid={`super-admin-status-${admin.id}`} />
                   </Stack>
                 </Box>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
