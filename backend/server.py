@@ -677,6 +677,8 @@ async def create_member(payload: MemberCreate, current_user=Depends(get_current_
             "method": payload.payment_method
         },
         "payment_history": payment_history,
+        "photo_url": payload.photo_url,
+        "photo_public_id": payload.photo_public_id,
         "created_by": current_user["_id"],
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow()
