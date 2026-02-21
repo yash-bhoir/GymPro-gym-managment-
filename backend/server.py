@@ -360,6 +360,8 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     user = await admins_collection.find_one({"_id": parse_object_id(user_id)})
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
+    if user.get("disabled"):
+        raise HTTPException(status_code=403, detail="Account is disabled")
     if user.get("token_version", 0) != payload.get("token_version"):
         raise HTTPException(status_code=401, detail="Token invalidated")
     return user
