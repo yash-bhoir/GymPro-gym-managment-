@@ -8,9 +8,11 @@ Build a Gym Membership Management Web Application that supports admin authentica
 - Backend: FastAPI + Motor (MongoDB) + JWT auth + APScheduler for daily reminders
 - DB: MongoDB Atlas (connection via MONGO_URL env)
 - Integrations: Gmail SMTP for OTP; WhatsApp Cloud API for reminders; Google OAuth 2.0
+- Super Admin: role-based access with global dashboards and admin/member management
 
 ## Implemented Features
 - Admin auth: register (OTP email), verify OTP, login, Google login, forgot/reset password, refresh token, rate-limit login attempts
+- Super Admin: auto-provisioned account, role-based navigation, global dashboard, admin management, global member visibility
 - Dashboard: member counts, revenue, charts, upcoming expirations
 - Members: CRUD, search/filter/sort, pagination, payment status, manual reminders
 - Packages: CRUD and assignment to members
@@ -20,8 +22,8 @@ Build a Gym Membership Management Web Application that supports admin authentica
 
 ## Backlog
 ### P0
-- Confirm end-to-end OTP email delivery in production
-- Confirm WhatsApp reminder sending with real credentials
+- Validate Google OAuth domain whitelisting in production
+- Validate WhatsApp reminders with real credentials
 
 ### P1
 - Add member status “Cancelled” workflow + UI actions
@@ -29,7 +31,7 @@ Build a Gym Membership Management Web Application that supports admin authentica
 
 ### P2
 - Add advanced analytics (churn, cohort retention)
-- Add role-based access (multi-admin)
+- Add role-based access (multi-admin roles)
 
 ## Next Tasks
 - Add WhatsApp Cloud API access token + phone number ID in Settings
