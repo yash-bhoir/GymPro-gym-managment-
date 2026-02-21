@@ -352,7 +352,7 @@ const Members = () => {
                     inputProps={{ 'data-testid': 'member-package-select' }}
                   >
                     {packages.map((pkg) => (
-                      <MenuItem key={pkg.id} value={pkg.id}>{pkg.name}</MenuItem>
+                      <MenuItem key={pkg.id} value={pkg.id} data-testid={`member-package-option-${pkg.id}`}>{pkg.name}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
