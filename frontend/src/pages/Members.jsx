@@ -7,7 +7,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   FormControl,
   Grid,
   InputLabel,
@@ -18,15 +17,20 @@ import {
   TextField,
   Typography,
   Alert,
-  Paper
+  Paper,
+  Avatar,
+  CircularProgress
 } from '@mui/material'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined'
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined'
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import dayjs from 'dayjs'
 import api from '../api'
+import { useAuth } from '../context/AuthContext'
 
 const defaultForm = {
   full_name: '',
@@ -39,10 +43,16 @@ const defaultForm = {
   joining_date: dayjs().format('YYYY-MM-DD'),
   package_id: '',
   paid_amount: 0,
-  payment_method: ''
+  payment_method: '',
+  photo_url: '',
+  photo_public_id: ''
 }
 
+const paymentMethods = ['Cash', 'Online', 'UPI', 'Card', 'Bank Transfer']
+const genderOptions = ['Male', 'Female', 'Other']
+
 const Members = () => {
+  const { admin } = useAuth()
   const [members, setMembers] = useState([])
   const [packages, setPackages] = useState([])
   const [filters, setFilters] = useState({ search: '', status: '', payment: '' })
@@ -57,6 +67,7 @@ const Members = () => {
   const [form, setForm] = useState(defaultForm)
   const [paymentForm, setPaymentForm] = useState({ amount: '', method: 'Cash', transaction_id: '', payment_date: dayjs().format('YYYY-MM-DD') })
   const [alert, setAlert] = useState({ type: '', message: '' })
+  const [photoUploading, setPhotoUploading] = useState(false)
 
   const fetchPackages = async () => {
     try {
@@ -114,7 +125,9 @@ const Members = () => {
         joining_date: member.joining_date ? dayjs(member.joining_date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD'),
         package_id: member.package_id || '',
         paid_amount: member.payment?.paid_amount || 0,
-        payment_method: member.payment?.method || ''
+        payment_method: member.payment?.method || '',
+        photo_url: member.photo_url || '',
+        photo_public_id: member.photo_public_id || ''
       })
     } else {
       setSelectedMember(null)
@@ -139,6 +152,44 @@ const Members = () => {
 
   const handlePaymentChange = (event) => {
     setPaymentForm({ ...paymentForm, [event.target.name]: event.target.value })
+  }
+
+  const handlePhotoChange = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setPhotoUploading(true)
+    try {
+      const signatureResponse = await api.get('/cloudinary/signature', { params: { resource_type: 'image' } })
+      const sig = signatureResponse.data
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('api_key', sig.api_key)
+      formData.append('timestamp', sig.timestamp)
+      formData.append('signature', sig.signature)
+      formData.append('folder', sig.folder)
+
+      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${sig.cloud_name}/image/upload`, {
+        method: 'POST',
+        body: formData
+      })
+      const uploadData = await uploadResponse.json()
+      if (!uploadData.secure_url) {
+        throw new Error(uploadData.error?.message || 'Upload failed')
+      }
+      setForm((prev) => ({
+        ...prev,
+        photo_url: uploadData.secure_url,
+        photo_public_id: uploadData.public_id
+      }))
+    } catch (error) {
+      setAlert({ type: 'error', message: error.message || 'Photo upload failed' })
+    } finally {
+      setPhotoUploading(false)
+    }
+  }
+
+  const handleRemovePhoto = () => {
+    setForm((prev) => ({ ...prev, photo_url: '', photo_public_id: '' }))
   }
 
   const handleSaveMember = async () => {
@@ -259,26 +310,31 @@ const Members = () => {
         </Alert>
       )}
 
-      <Paper elevation={0} sx={{ p: 3, borderRadius: 3 }}>
+      <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
         {loading ? (
           <Typography color="text.secondary" data-testid="members-loading">Loading members...</Typography>
         ) : (
           <Grid container spacing={2}>
             {members.map((member) => (
               <Grid item xs={12} key={member.id}>
-                <Paper elevation={0} sx={{ p: 2.5, borderRadius: 2, border: '1px solid', borderColor: 'divider' }} data-testid={`member-card-${member.id}`}>
+                <Paper elevation={0} sx={{ p: { xs: 2, md: 2.5 }, borderRadius: 2, border: '1px solid', borderColor: 'divider' }} data-testid={`member-card-${member.id}`}>
                   <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }}>
-                    <Box>
-                      <Typography variant="h6" data-testid={`member-name-${member.id}`}>{member.full_name}</Typography>
-                      <Typography variant="body2" color="text.secondary" data-testid={`member-contact-${member.id}`}>
-                        {member.phone_number} {member.email ? `• ${member.email}` : ''}
-                      </Typography>
-                      <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                        <Chip label={member.status} color={member.status === 'Active' ? 'success' : 'warning'} size="small" />
-                        <Chip label={member.payment?.status || 'Pending'} color="info" size="small" />
-                        <Chip label={`Ends ${new Date(member.end_date).toLocaleDateString()}`} size="small" variant="outlined" />
-                      </Stack>
-                    </Box>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+                      <Avatar src={member.photo_url || undefined} sx={{ width: 56, height: 56, bgcolor: 'secondary.main' }} data-testid={`member-photo-${member.id}`}>
+                        {member.full_name ? member.full_name.charAt(0).toUpperCase() : 'M'}
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6" data-testid={`member-name-${member.id}`}>{member.full_name}</Typography>
+                        <Typography variant="body2" color="text.secondary" data-testid={`member-contact-${member.id}`}>
+                          {member.phone_number} {member.email ? `• ${member.email}` : ''}
+                        </Typography>
+                        <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap' }}>
+                          <Chip label={member.status} color={member.status === 'Active' ? 'success' : 'warning'} size="small" data-testid={`member-status-${member.id}`} />
+                          <Chip label={member.payment?.status || 'Pending'} color="info" size="small" data-testid={`member-payment-${member.id}`} />
+                          <Chip label={`Ends ${new Date(member.end_date).toLocaleDateString()}`} size="small" variant="outlined" data-testid={`member-expiry-${member.id}`} />
+                        </Stack>
+                      </Box>
+                    </Stack>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
                       <Button variant="outlined" size="small" startIcon={<EditOutlinedIcon />} onClick={() => openMemberDialog(member)} data-testid={`edit-member-${member.id}`}>
                         Edit
@@ -315,6 +371,23 @@ const Members = () => {
         <DialogTitle data-testid="member-dialog-title">{selectedMember ? 'Edit Member' : 'Add Member'}</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 1 }}>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ xs: 'flex-start', md: 'center' }} sx={{ mb: 2 }}>
+              <Avatar src={form.photo_url || undefined} sx={{ width: 72, height: 72, bgcolor: 'secondary.main' }} data-testid="member-photo-preview">
+                {form.full_name ? form.full_name.charAt(0).toUpperCase() : 'M'}
+              </Avatar>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+                <Button variant="outlined" component="label" startIcon={<ImageOutlinedIcon />} disabled={photoUploading} data-testid="member-photo-upload-button">
+                  {photoUploading ? 'Uploading...' : 'Upload Photo'}
+                  <input hidden accept="image/*" type="file" onChange={handlePhotoChange} data-testid="member-photo-input" />
+                </Button>
+                {form.photo_url && (
+                  <Button variant="text" color="error" startIcon={<DeleteForeverOutlinedIcon />} onClick={handleRemovePhoto} data-testid="member-photo-remove-button">
+                    Remove
+                  </Button>
+                )}
+                {photoUploading && <CircularProgress size={20} data-testid="member-photo-uploading" />}
+              </Stack>
+            </Stack>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <TextField label="Full Name" name="full_name" value={form.full_name} onChange={handleMemberChange} fullWidth required inputProps={{ 'data-testid': 'member-name-input' }} />
@@ -332,7 +405,23 @@ const Members = () => {
                 <TextField label="Date of Birth" type="date" name="date_of_birth" value={form.date_of_birth} onChange={handleMemberChange} fullWidth InputLabelProps={{ shrink: true }} inputProps={{ 'data-testid': 'member-dob-input' }} />
               </Grid>
               <Grid item xs={12} md={4}>
-                <TextField label="Gender" name="gender" value={form.gender} onChange={handleMemberChange} fullWidth inputProps={{ 'data-testid': 'member-gender-input' }} />
+                <FormControl fullWidth>
+                  <InputLabel id="member-gender-label">Gender</InputLabel>
+                  <Select
+                    labelId="member-gender-label"
+                    name="gender"
+                    value={form.gender}
+                    label="Gender"
+                    onChange={handleMemberChange}
+                    inputProps={{ 'data-testid': 'member-gender-input' }}
+                  >
+                    {genderOptions.map((gender) => (
+                      <MenuItem key={gender} value={gender} data-testid={`member-gender-${gender.toLowerCase()}`}>
+                        {gender}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12} md={4}>
                 <TextField label="Emergency Contact" name="emergency_contact" value={form.emergency_contact} onChange={handleMemberChange} fullWidth inputProps={{ 'data-testid': 'member-emergency-input' }} />
@@ -352,7 +441,9 @@ const Members = () => {
                     inputProps={{ 'data-testid': 'member-package-select' }}
                   >
                     {packages.map((pkg) => (
-                      <MenuItem key={pkg.id} value={pkg.id} data-testid={`member-package-option-${pkg.id}`}>{pkg.name}</MenuItem>
+                      <MenuItem key={pkg.id} value={pkg.id} data-testid={`member-package-option-${pkg.id}`}>
+                        {pkg.name}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -361,7 +452,23 @@ const Members = () => {
                 <TextField label="Paid Amount" type="number" name="paid_amount" value={form.paid_amount} onChange={handleMemberChange} fullWidth inputProps={{ 'data-testid': 'member-paid-amount-input' }} />
               </Grid>
               <Grid item xs={12} md={6}>
-                <TextField label="Payment Method" name="payment_method" value={form.payment_method} onChange={handleMemberChange} fullWidth inputProps={{ 'data-testid': 'member-payment-method-input' }} />
+                <FormControl fullWidth>
+                  <InputLabel id="member-payment-method-label">Payment Method</InputLabel>
+                  <Select
+                    labelId="member-payment-method-label"
+                    name="payment_method"
+                    value={form.payment_method}
+                    label="Payment Method"
+                    onChange={handleMemberChange}
+                    inputProps={{ 'data-testid': 'member-payment-method-input' }}
+                  >
+                    {paymentMethods.map((method) => (
+                      <MenuItem key={method} value={method} data-testid={`member-payment-method-${method.toLowerCase().replace(/\s/g, '-')}`}>
+                        {method}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
             </Grid>
           </Box>
