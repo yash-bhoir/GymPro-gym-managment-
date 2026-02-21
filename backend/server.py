@@ -216,6 +216,8 @@ class MemberCreate(BaseModel):
     package_id: str
     payment_method: Optional[str] = None
     paid_amount: float = 0
+    photo_url: Optional[str] = None
+    photo_public_id: Optional[str] = None
 
 
 class MemberUpdate(BaseModel):
@@ -231,6 +233,8 @@ class MemberUpdate(BaseModel):
     status: Optional[str] = None
     payment_method: Optional[str] = None
     paid_amount: Optional[float] = None
+    photo_url: Optional[str] = None
+    photo_public_id: Optional[str] = None
 
 
 class AddPaymentRequest(BaseModel):
