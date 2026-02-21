@@ -19,6 +19,9 @@ from bson import ObjectId
 import httpx
 import smtplib
 import ssl
+import time
+import cloudinary
+import cloudinary.utils
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 from google.oauth2 import id_token as google_id_token
@@ -35,6 +38,9 @@ SMTP_APP_PASSWORD = os.environ.get("SMTP_APP_PASSWORD")
 SMTP_ENABLED = os.environ.get("SMTP_ENABLED", "false").lower() == "true"
 SUPER_ADMIN_EMAIL = os.environ.get("SUPER_ADMIN_EMAIL")
 SUPER_ADMIN_PASSWORD = os.environ.get("SUPER_ADMIN_PASSWORD")
+CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET")
 CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
