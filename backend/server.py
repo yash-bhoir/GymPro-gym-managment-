@@ -394,6 +394,8 @@ async def register(payload: RegisterRequest):
         "verified": False,
         "otp_code": otp,
         "otp_expires_at": otp_expiry,
+        "role": existing.get("role", "admin") if existing else "admin",
+        "disabled": existing.get("disabled", False) if existing else False,
         "token_version": existing.get("token_version", 0) if existing else 0,
         "created_at": existing.get("created_at", datetime.utcnow()) if existing else datetime.utcnow(),
         "updated_at": datetime.utcnow()
