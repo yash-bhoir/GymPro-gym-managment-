@@ -866,6 +866,157 @@ async def dashboard_summary(current_user=Depends(get_current_user)):
     }
 
 
+@app.get("/api/super/summary")
+async def super_summary(current_user=Depends(require_super_admin)):
+    admin_query = {"role": {"$ne": "super_admin"}}
+    total_admins = await admins_collection.count_documents(admin_query)
+    total_members = await members_collection.count_documents({})
+    active_members = await members_collection.count_documents({"status": "Active"})
+    expired_members = await members_collection.count_documents({"status": "Expired"})
+    pending_payments = await members_collection.count_documents({"payment.status": {"$ne": "Fully Paid"}})
+
+    total_revenue = 0
+    monthly_revenue = {i: 0 for i in range(1, 13)}
+    now = datetime.utcnow()
+
+    async for member in members_collection.find({}):
+        payment = member.get("payment", {})
+        total_revenue += payment.get("paid_amount", 0)
+        for item in member.get("payment_history", []):
+            date = item.get("payment_date")
+            if isinstance(date, str):
+                date = datetime.fromisoformat(date)
+            if date and date.year == now.year:
+                monthly_revenue[date.month] += item.get("amount", 0)
+
+    revenue_list = [{"month": month, "value": monthly_revenue[month]} for month in range(1, 13)]
+
+    return {
+        "total_admins": total_admins,
+        "total_members": total_members,
+        "active_members": active_members,
+        "expired_members": expired_members,
+        "pending_payments": pending_payments,
+        "total_revenue": total_revenue,
+        "monthly_revenue": revenue_list
+    }
+
+
+@app.get("/api/super/admins")
+async def list_admins(
+    search: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 10,
+    current_user=Depends(require_super_admin)
+):
+    query: Dict[str, Any] = {"role": {"$ne": "super_admin"}}
+    if search:
+        query["$or"] = [
+            {"full_name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
+
+    total = await admins_collection.count_documents(query)
+    cursor = admins_collection.find(query).skip((page - 1) * page_size).limit(page_size)
+    admins = []
+    async for admin in cursor:
+        members_count = await members_collection.count_documents({"created_by": admin["_id"]})
+        admins.append({
+            **sanitize_admin(admin),
+            "members_count": members_count
+        })
+
+    return {"admins": admins, "total": total, "page": page, "page_size": page_size}
+
+
+@app.put("/api/super/admins/{admin_id}")
+async def update_admin(admin_id: str, payload: AdminUpdateRequest, current_user=Depends(require_super_admin)):
+    update_data = {k: v for k, v in payload.dict().items() if v is not None}
+
+    if "email" in update_data:
+        existing = await admins_collection.find_one({"email": update_data["email"], "_id": {"$ne": parse_object_id(admin_id)}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already in use")
+
+    if update_data:
+        update_data["updated_at"] = datetime.utcnow()
+        await admins_collection.update_one({"_id": parse_object_id(admin_id)}, {"$set": update_data})
+
+    admin = await admins_collection.find_one({"_id": parse_object_id(admin_id)})
+    if not admin:
+        raise HTTPException(status_code=404, detail="Admin not found")
+    return {"admin": sanitize_admin(admin)}
+
+
+@app.post("/api/super/admins/{admin_id}/reset-password")
+async def reset_admin_password(admin_id: str, payload: AdminResetPasswordRequest, current_user=Depends(require_super_admin)):
+    new_hash = hash_password(payload.new_password)
+    token_version = 0
+    admin = await admins_collection.find_one({"_id": parse_object_id(admin_id)})
+    if not admin:
+        raise HTTPException(status_code=404, detail="Admin not found")
+    token_version = admin.get("token_version", 0) + 1
+    await admins_collection.update_one(
+        {"_id": admin["_id"]},
+        {"$set": {"password_hash": new_hash, "token_version": token_version}}
+    )
+    return {"message": "Password reset"}
+
+
+@app.delete("/api/super/admins/{admin_id}")
+async def delete_admin(admin_id: str, current_user=Depends(require_super_admin)):
+    admin_object_id = parse_object_id(admin_id)
+    admin = await admins_collection.find_one({"_id": admin_object_id})
+    if not admin:
+        raise HTTPException(status_code=404, detail="Admin not found")
+
+    await members_collection.delete_many({"created_by": admin_object_id})
+    await packages_collection.delete_many({"created_by": admin_object_id})
+    await settings_collection.delete_many({"admin_id": admin_object_id})
+    await admins_collection.delete_one({"_id": admin_object_id})
+
+    return {"message": "Admin deleted"}
+
+
+@app.get("/api/super/members")
+async def list_all_members(
+    search: Optional[str] = None,
+    admin_id: Optional[str] = None,
+    status_filter: Optional[str] = None,
+    payment_status: Optional[str] = None,
+    sort_by: Optional[str] = "end_date",
+    sort_dir: Optional[int] = 1,
+    page: int = 1,
+    page_size: int = 10,
+    current_user=Depends(require_super_admin)
+):
+    query: Dict[str, Any] = {}
+    if search:
+        query["$or"] = [
+            {"full_name": {"$regex": search, "$options": "i"}},
+            {"phone_number": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
+    if status_filter:
+        query["status"] = status_filter
+    if payment_status:
+        query["payment.status"] = payment_status
+    if admin_id:
+        query["created_by"] = parse_object_id(admin_id)
+
+    total = await members_collection.count_documents(query)
+    cursor = members_collection.find(query).sort(sort_by, sort_dir).skip((page - 1) * page_size).limit(page_size)
+    members = []
+    async for member in cursor:
+        member = await update_member_status(member)
+        admin = await admins_collection.find_one({"_id": member.get("created_by")})
+        serialized = serialize_id(member)
+        serialized["admin"] = sanitize_admin(admin) if admin else None
+        members.append(serialized)
+
+    return {"members": members, "total": total, "page": page, "page_size": page_size}
+
+
 @app.get("/api/settings")
 async def get_settings(current_user=Depends(get_current_user)):
     settings = await get_admin_settings(current_user["_id"])
