@@ -7,9 +7,23 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   background: radial-gradient(circle at top, #f6f4ff 0%, #f1f6ff 45%, #fef6f1 100%);
   color: #1f2233;
+  min-height: 100vh;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+}
+
+@media (max-width: 480px) {
+  .MuiTypography-h4 {
+    font-size: 1.6rem;
+  }
+  .MuiTypography-h5 {
+    font-size: 1.3rem;
+  }
+  .MuiToolbar-root {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
 }
