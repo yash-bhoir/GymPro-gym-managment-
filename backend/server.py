@@ -829,7 +829,7 @@ async def update_profile(payload: ProfileUpdateRequest, current_user=Depends(get
     if update_data:
         await admins_collection.update_one({"_id": current_user["_id"]}, {"$set": update_data})
     updated = await admins_collection.find_one({"_id": current_user["_id"]})
-    return {"admin": serialize_id(updated)}
+    return {"admin": sanitize_admin(updated)}
 
 
 @app.put("/api/settings/password")
