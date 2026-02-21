@@ -234,10 +234,10 @@ const Members = () => {
               onChange={(event) => setFilters({ ...filters, payment: event.target.value })}
               inputProps={{ 'data-testid': 'members-payment-filter' }}
             >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="Fully Paid">Fully Paid</MenuItem>
-              <MenuItem value="Partially Paid">Partially Paid</MenuItem>
-              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="" data-testid="members-payment-all-option">All</MenuItem>
+              <MenuItem value="Fully Paid" data-testid="members-payment-fully-paid-option">Fully Paid</MenuItem>
+              <MenuItem value="Partially Paid" data-testid="members-payment-partially-paid-option">Partially Paid</MenuItem>
+              <MenuItem value="Pending" data-testid="members-payment-pending-option">Pending</MenuItem>
             </Select>
           </FormControl>
           <Button
