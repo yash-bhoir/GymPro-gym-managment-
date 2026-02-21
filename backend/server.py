@@ -416,7 +416,7 @@ async def verify_otp(payload: VerifyOtpRequest):
     access_token = create_token(str(user["_id"]), "access", token_version, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     refresh_token = create_token(str(user["_id"]), "refresh", token_version, timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
 
-    return {"access_token": access_token, "refresh_token": refresh_token, "admin": serialize_id(user)}
+    return {"access_token": access_token, "refresh_token": refresh_token, "admin": sanitize_admin(user)}
 
 
 @app.post("/api/auth/login")
@@ -434,7 +434,7 @@ async def login(payload: LoginRequest):
     access_token = create_token(str(user["_id"]), "access", token_version, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     refresh_token = create_token(str(user["_id"]), "refresh", token_version, timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
 
-    return {"access_token": access_token, "refresh_token": refresh_token, "admin": serialize_id(user)}
+    return {"access_token": access_token, "refresh_token": refresh_token, "admin": sanitize_admin(user)}
 
 
 @app.post("/api/auth/google")
@@ -472,7 +472,7 @@ async def google_login(payload: GoogleLoginRequest):
     access_token = create_token(str(user["_id"]), "access", token_version, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     refresh_token = create_token(str(user["_id"]), "refresh", token_version, timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
 
-    return {"access_token": access_token, "refresh_token": refresh_token, "admin": serialize_id(user)}
+    return {"access_token": access_token, "refresh_token": refresh_token, "admin": sanitize_admin(user)}
 
 
 @app.post("/api/auth/forgot-password")
