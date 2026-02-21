@@ -147,9 +147,9 @@ const SuperMembers = () => {
                       Admin: {member.admin?.full_name || 'Unknown'} ({member.admin?.email || 'N/A'})
                     </Typography>
                     <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap' }}>
-                      <Chip label={member.status} color={member.status === 'Active' ? 'success' : 'warning'} size="small" />
-                      <Chip label={member.payment?.status || 'Pending'} color="info" size="small" />
-                      <Chip label={`Ends ${new Date(member.end_date).toLocaleDateString()}`} size="small" variant="outlined" />
+                      <Chip label={member.status} color={member.status === 'Active' ? 'success' : 'warning'} size="small" data-testid={`super-member-status-${member.id}`} />
+                      <Chip label={member.payment?.status || 'Pending'} color="info" size="small" data-testid={`super-member-payment-${member.id}`} />
+                      <Chip label={`Ends ${new Date(member.end_date).toLocaleDateString()}`} size="small" variant="outlined" data-testid={`super-member-expiry-${member.id}`} />
                     </Stack>
                   </Box>
                 </Stack>
