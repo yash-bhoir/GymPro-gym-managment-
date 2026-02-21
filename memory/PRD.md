@@ -15,6 +15,9 @@ Build a Gym Membership Management Web Application that supports admin authentica
 - Super Admin: auto-provisioned account, role-based navigation, global dashboard, admin management, global member visibility
 - Dashboard: member counts, revenue, charts, upcoming expirations
 - Members: CRUD, search/filter/sort, pagination, payment status, manual reminders
+
+- Member photos: optional Cloudinary upload with signed URLs; photo shown in list and Add/Edit dialog
+- Member form dropdowns: gender and payment method
 - Packages: CRUD and assignment to members
 - Payments: partial payments + history tracking
 - Settings: profile, password change, SMTP/WhatsApp credentials, reminder rules
