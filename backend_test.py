@@ -675,38 +675,49 @@ class GymAPITester:
             print("❌ Super Admin login failed. This is critical for the app.")
             return False
         
-        # Test 3: Super Admin Dashboard
+        # Test 4: Cloudinary signature (requires auth)
+        self.test_cloudinary_signature()
+        
+        # Test 5: Super Admin Dashboard
         if not self.test_super_dashboard_summary():
             print("⚠️ Super admin dashboard failed")
         
-        # Test 4: Super Admin List
+        # Test 6: Super Admin List
         if not self.test_super_admin_list():
             print("⚠️ Super admin list failed")
         
-        # Test 5: Super Members List
+        # Test 7: Super Members List
         if not self.test_super_members_list():
             print("⚠️ Super members list failed")
         
-        # Test 6: Registration
+        # Test 8: Package CRUD (required for member tests)
+        if not self.test_package_crud():
+            print("⚠️ Package CRUD failed")
+        
+        # Test 9: Members CRUD with photo support
+        if not self.test_members_crud():
+            print("⚠️ Member CRUD failed")
+        
+        # Test 10: Registration
         if not self.test_register_admin():
             print("❌ Registration failed. Stopping regular admin tests.")
         else:
-            # Test 7: OTP verification (expected to fail)
+            # Test 11: OTP verification (expected to fail)
             self.test_otp_verification()
             
-            # Test 8: Regular admin access to super routes
+            # Test 12: Regular admin access to super routes
             self.test_regular_admin_access_to_super_routes()
         
-        # Test 9: Invalid login
+        # Test 13: Invalid login
         self.test_login_invalid()
         
-        # Test 10: Google login without valid token
+        # Test 14: Google login without valid token
         self.test_google_login_without_client_id()
         
-        # Test 11: Forgot password
+        # Test 15: Forgot password
         self.test_forgot_password()
         
-        # Test 12: Protected routes without auth
+        # Test 16: Protected routes without auth
         self.test_protected_routes_without_auth()
         
         # Test summary
