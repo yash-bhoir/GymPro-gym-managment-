@@ -345,7 +345,7 @@ async def update_member_status(member: dict) -> dict:
         return member
     now = datetime.utcnow()
     status_value = member.get("status", "Active")
-    if member["end_date"] < now and status_value != "Expired":
+    if member["end_date"] < now and status_value not in ["Expired", "Cancelled"]:
         await members_collection.update_one({"_id": member["_id"]}, {"$set": {"status": "Expired"}})
         member["status"] = "Expired"
     return member
