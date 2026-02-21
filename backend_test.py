@@ -659,8 +659,8 @@ class GymAPITester:
             return False
 
 def main():
-    # Get the backend URL from environment
-    backend_url = "http://localhost:8001"
+    # Use the external backend URL from frontend .env
+    backend_url = "https://gym-admin-pro.cluster-0.preview.emergentcf.cloud"
     
     print("🏋️ Gym Membership Management API Testing")
     print("=" * 50)
