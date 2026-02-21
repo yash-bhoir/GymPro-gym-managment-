@@ -1,0 +1,70 @@
+{
+  "summary": {
+    "total_tests": 10,
+    "passed_tests": 3,
+    "success_rate": "30.0%"
+  },
+  "test_results": [
+    {
+      "test_name": "Backend Health Check",
+      "status": "PASS",
+      "details": "Status: 200",
+      "timestamp": "2026-02-21T06:26:04.631793"
+    },
+    {
+      "test_name": "Admin Registration",
+      "status": "PASS",
+      "details": "Registration successful",
+      "timestamp": "2026-02-21T06:26:04.856888"
+    },
+    {
+      "test_name": "OTP Verification",
+      "status": "FAIL",
+      "details": "Request failed",
+      "timestamp": "2026-02-21T06:26:04.859322"
+    },
+    {
+      "test_name": "Invalid Login Rejection",
+      "status": "FAIL",
+      "details": "Request failed",
+      "timestamp": "2026-02-21T06:26:04.861297"
+    },
+    {
+      "test_name": "Google Login Without Config",
+      "status": "FAIL",
+      "details": "Request failed",
+      "timestamp": "2026-02-21T06:26:04.862483"
+    },
+    {
+      "test_name": "Forgot Password",
+      "status": "PASS",
+      "details": "OTP generation successful",
+      "timestamp": "2026-02-21T06:26:04.864891"
+    },
+    {
+      "test_name": "Protected Route /dashboard/summary",
+      "status": "FAIL",
+      "details": "Expected 401, got No response",
+      "timestamp": "2026-02-21T06:26:04.866211"
+    },
+    {
+      "test_name": "Protected Route /packages",
+      "status": "FAIL",
+      "details": "Expected 401, got No response",
+      "timestamp": "2026-02-21T06:26:04.867348"
+    },
+    {
+      "test_name": "Protected Route /members",
+      "status": "FAIL",
+      "details": "Expected 401, got No response",
+      "timestamp": "2026-02-21T06:26:04.868347"
+    },
+    {
+      "test_name": "Protected Route /settings",
+      "status": "FAIL",
+      "details": "Expected 401, got No response",
+      "timestamp": "2026-02-21T06:26:04.869315"
+    }
+  ],
+  "timestamp": "20260221_062604"
+}
