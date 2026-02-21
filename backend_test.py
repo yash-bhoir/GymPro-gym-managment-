@@ -172,7 +172,40 @@ class GymAPITester:
             self.log_test("Forgot Password", False, details)
             return False
 
-    def test_packages_crud(self):
+    def test_login_invalid(self):
+        """Test login with invalid credentials"""
+        print("\n🔍 Testing Invalid Login...")
+        payload = {
+            "email": "invalid@test.com",
+            "password": "wrongpass"
+        }
+        
+        response = self.make_request('POST', '/auth/login', payload, auth_required=False)
+        
+        if response and response.status_code == 401:
+            self.log_test("Invalid Login Rejection", True, "Correctly rejected invalid credentials")
+            return True
+        else:
+            details = response.text if response else "Request failed"
+            self.log_test("Invalid Login Rejection", False, details)
+            return False
+
+    def test_google_login_without_client_id(self):
+        """Test Google login when client ID is not configured"""
+        print("\n🔍 Testing Google Login (No Client ID)...")
+        payload = {
+            "id_token": "fake_google_token"
+        }
+        
+        response = self.make_request('POST', '/auth/google', payload, auth_required=False)
+        
+        if response and response.status_code == 400:
+            self.log_test("Google Login Without Config", True, "Correctly rejected when no client ID")
+            return True
+        else:
+            details = response.text if response else "Request failed"
+            self.log_test("Google Login Without Config", False, details)
+            return False
         """Test package CRUD operations"""
         print("\n🔍 Testing Package CRUD...")
         
