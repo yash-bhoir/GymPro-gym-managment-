@@ -103,6 +103,17 @@ def serialize_id(doc: dict) -> dict:
     return doc
 
 
+def sanitize_admin(doc: dict) -> dict:
+    if not doc:
+        return doc
+    return {
+        "id": str(doc["_id"]),
+        "full_name": doc.get("full_name"),
+        "email": doc.get("email"),
+        "verified": doc.get("verified", False)
+    }
+
+
 def parse_object_id(value: str) -> ObjectId:
     try:
         return ObjectId(value)
