@@ -53,8 +53,10 @@ class GymAPITester:
             elif method.upper() == 'DELETE':
                 response = requests.delete(url, headers=headers, timeout=10)
             
+            print(f"   Request: {method} {url} -> {response.status_code}")
             return response
         except Exception as e:
+            print(f"   Request Error: {method} {url} -> {str(e)}")
             return None
 
     def test_health_check(self):
