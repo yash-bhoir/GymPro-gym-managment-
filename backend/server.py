@@ -445,6 +445,8 @@ async def login(payload: LoginRequest):
     user = await admins_collection.find_one({"email": payload.email})
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    if user.get("disabled"):
+        raise HTTPException(status_code=403, detail="Account is disabled")
     if not user.get("verified"):
         raise HTTPException(status_code=403, detail="Account not verified")
     if not verify_password(payload.password, user.get("password_hash", "")):
