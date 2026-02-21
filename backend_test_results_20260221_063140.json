@@ -1,0 +1,76 @@
+{
+  "test_summary": {
+    "total_tests": 11,
+    "passed_tests": 4,
+    "success_rate": "36.4%",
+    "timestamp": "20260221_063140"
+  },
+  "test_results": [
+    {
+      "test_name": "Backend Health Check",
+      "status": "PASS",
+      "details": "Status: 200",
+      "timestamp": "2026-02-21T06:31:40.070092"
+    },
+    {
+      "test_name": "Database Connection",
+      "status": "PASS",
+      "details": "Verified via successful registration",
+      "timestamp": "2026-02-21T06:31:40.070168"
+    },
+    {
+      "test_name": "Registration",
+      "status": "PASS",
+      "details": "Admin registered successfully",
+      "timestamp": "2026-02-21T06:31:40.299241"
+    },
+    {
+      "test_name": "Invalid Login Rejection",
+      "status": "FAIL",
+      "details": "Status: No response",
+      "timestamp": "2026-02-21T06:31:40.301695"
+    },
+    {
+      "test_name": "Google Login (No Client ID)",
+      "status": "FAIL",
+      "details": "Status: No response",
+      "timestamp": "2026-02-21T06:31:40.302964"
+    },
+    {
+      "test_name": "Forgot Password",
+      "status": "PASS",
+      "details": "Status: 200",
+      "timestamp": "2026-02-21T06:31:40.307892"
+    },
+    {
+      "test_name": "OTP Verification (Invalid)",
+      "status": "FAIL",
+      "details": "Status: No response",
+      "timestamp": "2026-02-21T06:31:40.309963"
+    },
+    {
+      "test_name": "Protected Route /dashboard/summary",
+      "status": "FAIL",
+      "details": "Status: No response",
+      "timestamp": "2026-02-21T06:31:40.311227"
+    },
+    {
+      "test_name": "Protected Route /packages",
+      "status": "FAIL",
+      "details": "Status: No response",
+      "timestamp": "2026-02-21T06:31:40.312337"
+    },
+    {
+      "test_name": "Protected Route /members",
+      "status": "FAIL",
+      "details": "Status: No response",
+      "timestamp": "2026-02-21T06:31:40.313275"
+    },
+    {
+      "test_name": "Protected Route /settings",
+      "status": "FAIL",
+      "details": "Status: No response",
+      "timestamp": "2026-02-21T06:31:40.314223"
+    }
+  ]
+}
