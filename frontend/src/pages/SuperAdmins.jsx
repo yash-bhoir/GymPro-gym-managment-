@@ -216,8 +216,8 @@ const SuperAdmins = () => {
               fullWidth
               inputProps={{ 'data-testid': 'super-admin-edit-status-select' }}
             >
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="disabled">Disabled</MenuItem>
+              <MenuItem value="active" data-testid="super-admin-edit-status-active">Active</MenuItem>
+              <MenuItem value="disabled" data-testid="super-admin-edit-status-disabled">Disabled</MenuItem>
             </TextField>
           </Box>
         </DialogContent>
