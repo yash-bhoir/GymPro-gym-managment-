@@ -205,8 +205,8 @@ const SuperAdmins = () => {
               fullWidth
               inputProps={{ 'data-testid': 'super-admin-edit-verified-select' }}
             >
-              <MenuItem value="yes">Verified</MenuItem>
-              <MenuItem value="no">Not Verified</MenuItem>
+              <MenuItem value="yes" data-testid="super-admin-edit-verified-yes">Verified</MenuItem>
+              <MenuItem value="no" data-testid="super-admin-edit-verified-no">Not Verified</MenuItem>
             </TextField>
             <TextField
               select
