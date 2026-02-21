@@ -1170,6 +1170,14 @@ async def startup_event():
     packages_collection = db["packages"]
     settings_collection = db["settings"]
 
+    if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
+        cloudinary.config(
+            cloud_name=CLOUDINARY_CLOUD_NAME,
+            api_key=CLOUDINARY_API_KEY,
+            api_secret=CLOUDINARY_API_SECRET,
+            secure=True
+        )
+
     if SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD:
         existing_super = await admins_collection.find_one({"email": SUPER_ADMIN_EMAIL})
         if existing_super:
