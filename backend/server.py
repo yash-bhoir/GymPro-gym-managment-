@@ -275,6 +275,17 @@ class PasswordChangeRequest(BaseModel):
     new_password: str
 
 
+class AdminUpdateRequest(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    verified: Optional[bool] = None
+    disabled: Optional[bool] = None
+
+
+class AdminResetPasswordRequest(BaseModel):
+    new_password: str
+
+
 async def send_email(to_email: str, subject: str, body: str, smtp_settings: SMTPSettings):
     if not smtp_settings.enabled or not smtp_settings.email or not smtp_settings.app_password:
         raise HTTPException(status_code=400, detail="Email reminders are not configured")
