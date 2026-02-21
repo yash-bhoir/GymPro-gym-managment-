@@ -269,9 +269,9 @@ const Settings = () => {
                   fullWidth
                   inputProps={{ 'data-testid': 'reminder-type-select' }}
                 >
-                  <MenuItem value="email">Email Only</MenuItem>
-                  <MenuItem value="whatsapp">WhatsApp Only</MenuItem>
-                  <MenuItem value="both">Email + WhatsApp</MenuItem>
+                  <MenuItem value="email" data-testid="reminder-type-email-option">Email Only</MenuItem>
+                  <MenuItem value="whatsapp" data-testid="reminder-type-whatsapp-option">WhatsApp Only</MenuItem>
+                  <MenuItem value="both" data-testid="reminder-type-both-option">Email + WhatsApp</MenuItem>
                 </TextField>
               </Grid>
               <Grid item xs={12} md={6}>
