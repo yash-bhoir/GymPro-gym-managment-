@@ -532,7 +532,7 @@ async def refresh_token(payload: RefreshRequest):
 
 @app.get("/api/auth/me")
 async def get_me(current_user=Depends(get_current_user)):
-    return {"admin": serialize_id(current_user)}
+    return {"admin": sanitize_admin(current_user)}
 
 
 @app.post("/api/packages")
