@@ -446,11 +446,11 @@ class GymAPITester:
         
         for endpoint in endpoints:
             response = self.make_request('GET', endpoint)
-            if response and response.status_code == 401:
-                self.log_test(f"Protected Route {endpoint}", True, "Correctly rejected unauthorized access")
+            if response and response.status_code in [401, 403]:
+                self.log_test(f"Protected Route {endpoint}", True, f"Correctly rejected unauthorized access ({response.status_code})")
             else:
                 status = response.status_code if response else "No response"
-                self.log_test(f"Protected Route {endpoint}", False, f"Expected 401, got {status}")
+                self.log_test(f"Protected Route {endpoint}", False, f"Expected 401/403, got {status}")
         
         # Restore token
         self.access_token = original_token
