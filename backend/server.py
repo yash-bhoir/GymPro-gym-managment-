@@ -481,6 +481,8 @@ async def google_login(payload: GoogleLoginRequest):
             "password_hash": None,
             "verified": True,
             "google_sub": google_sub,
+            "role": "admin",
+            "disabled": False,
             "token_version": 0,
             "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow()
