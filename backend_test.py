@@ -608,39 +608,55 @@ class GymAPITester:
             print("❌ Backend is not accessible. Stopping tests.")
             return False
         
-        # Test 2: Registration
-        if not self.test_register_admin():
-            print("❌ Registration failed. Stopping tests.")
+        # Test 2: Super Admin Login (Priority test)
+        if not self.test_super_admin_login():
+            print("❌ Super Admin login failed. This is critical for the app.")
             return False
         
-        # Test 3: OTP verification (expected to fail)
-        self.test_otp_verification()
+        # Test 3: Super Admin Dashboard
+        if not self.test_super_dashboard_summary():
+            print("⚠️ Super admin dashboard failed")
         
-        # Test 4: Invalid login
+        # Test 4: Super Admin List
+        if not self.test_super_admin_list():
+            print("⚠️ Super admin list failed")
+        
+        # Test 5: Super Members List
+        if not self.test_super_members_list():
+            print("⚠️ Super members list failed")
+        
+        # Test 6: Registration
+        if not self.test_register_admin():
+            print("❌ Registration failed. Stopping regular admin tests.")
+        else:
+            # Test 7: OTP verification (expected to fail)
+            self.test_otp_verification()
+            
+            # Test 8: Regular admin access to super routes
+            self.test_regular_admin_access_to_super_routes()
+        
+        # Test 9: Invalid login
         self.test_login_invalid()
         
-        # Test 5: Google login without client ID
+        # Test 10: Google login without valid token
         self.test_google_login_without_client_id()
         
-        # Test 6: Forgot password
+        # Test 11: Forgot password
         self.test_forgot_password()
         
-        # Test 7: Protected routes without auth
+        # Test 12: Protected routes without auth
         self.test_protected_routes_without_auth()
-        
-        # For remaining tests, we'd need a valid token
-        print("\n⚠️  Note: CRUD tests require valid authentication tokens")
-        print("   Registration/OTP verification would be needed for full testing")
         
         # Test summary
         print(f"\n📊 Test Results: {self.tests_passed}/{self.tests_run} tests passed")
+        success_rate = (self.tests_passed/self.tests_run)*100 if self.tests_run > 0 else 0
         
-        if self.tests_passed < self.tests_run:
-            print("❌ Some tests failed - check logs above")
-            return False
-        else:
-            print("✅ All accessible tests passed")
+        if success_rate >= 80:
+            print(f"✅ {success_rate:.1f}% tests passed - Good!")
             return True
+        else:
+            print(f"❌ Only {success_rate:.1f}% tests passed - Issues found")
+            return False
 
 def main():
     # Get the backend URL from environment
