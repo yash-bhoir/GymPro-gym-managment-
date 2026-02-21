@@ -52,12 +52,12 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-client = AsyncIOMotorClient(MONGO_URL)
-db = client[DB_NAME]
-admins_collection = db["admins"]
-members_collection = db["members"]
-packages_collection = db["packages"]
-settings_collection = db["settings"]
+client = None
+db = None
+admins_collection = None
+members_collection = None
+packages_collection = None
+settings_collection = None
 
 scheduler = AsyncIOScheduler()
 
