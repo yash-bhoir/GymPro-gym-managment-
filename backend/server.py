@@ -378,6 +378,12 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     return user
 
 
+async def require_super_admin(current_user=Depends(get_current_user)):
+    if current_user.get("role") != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    return current_user
+
+
 def record_login_attempt(email: str):
     now = datetime.utcnow()
     attempts = LOGIN_ATTEMPTS.get(email, [])
