@@ -327,10 +327,8 @@ async def get_admin_settings(admin_id: ObjectId) -> dict:
 async def get_smtp_settings(admin_id: ObjectId) -> SMTPSettings:
     settings = await get_admin_settings(admin_id)
     smtp = settings.get("smtp", {})
-    if smtp.get("enabled"):
+    if smtp.get("enabled") and smtp.get("email") and smtp.get("app_password"):
         return SMTPSettings(**smtp)
-    if SMTP_ENABLED and SMTP_EMAIL and SMTP_APP_PASSWORD:
-        return SMTPSettings(email=SMTP_EMAIL, app_password=SMTP_APP_PASSWORD, enabled=True)
     return SMTPSettings(enabled=False)
 
 
