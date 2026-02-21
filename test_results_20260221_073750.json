@@ -1,0 +1,100 @@
+{
+  "summary": {
+    "total_tests": 15,
+    "passed_tests": 7,
+    "success_rate": "46.7%"
+  },
+  "test_results": [
+    {
+      "test_name": "Backend Health Check",
+      "status": "PASS",
+      "details": "Status: 403 (API responding)",
+      "timestamp": "2026-02-21T07:37:42.386838"
+    },
+    {
+      "test_name": "Super Admin Login",
+      "status": "PASS",
+      "details": "Logged in as Super Admin with super_admin role",
+      "timestamp": "2026-02-21T07:37:42.852453"
+    },
+    {
+      "test_name": "Super Dashboard Summary",
+      "status": "PASS",
+      "details": "All required fields present. Total admins: 2, Total members: 0",
+      "timestamp": "2026-02-21T07:37:44.539841"
+    },
+    {
+      "test_name": "Super Admin List",
+      "status": "PASS",
+      "details": "Retrieved 2 admins out of 2 total",
+      "timestamp": "2026-02-21T07:37:45.741959"
+    },
+    {
+      "test_name": "Super Members List",
+      "status": "PASS",
+      "details": "Retrieved 0 members out of 0 total",
+      "timestamp": "2026-02-21T07:37:46.466118"
+    },
+    {
+      "test_name": "Admin Registration",
+      "status": "PASS",
+      "details": "Registration successful",
+      "timestamp": "2026-02-21T07:37:48.530092"
+    },
+    {
+      "test_name": "OTP Verification",
+      "status": "FAIL",
+      "details": "Expected 400 for invalid OTP, got No response",
+      "timestamp": "2026-02-21T07:37:48.774105"
+    },
+    {
+      "test_name": "Regular Admin Super Access",
+      "status": "FAIL",
+      "details": "No regular admin token",
+      "timestamp": "2026-02-21T07:37:48.774184"
+    },
+    {
+      "test_name": "Invalid Login Rejection",
+      "status": "FAIL",
+      "details": "Request failed",
+      "timestamp": "2026-02-21T07:37:49.016125"
+    },
+    {
+      "test_name": "Google Login Without Valid Token",
+      "status": "FAIL",
+      "details": "Request failed",
+      "timestamp": "2026-02-21T07:37:49.069436"
+    },
+    {
+      "test_name": "Forgot Password",
+      "status": "PASS",
+      "details": "OTP generation successful",
+      "timestamp": "2026-02-21T07:37:50.723111"
+    },
+    {
+      "test_name": "Protected Route /dashboard/summary",
+      "status": "FAIL",
+      "details": "Expected 401/403, got No response",
+      "timestamp": "2026-02-21T07:37:50.724706"
+    },
+    {
+      "test_name": "Protected Route /packages",
+      "status": "FAIL",
+      "details": "Expected 401/403, got No response",
+      "timestamp": "2026-02-21T07:37:50.725896"
+    },
+    {
+      "test_name": "Protected Route /members",
+      "status": "FAIL",
+      "details": "Expected 401/403, got No response",
+      "timestamp": "2026-02-21T07:37:50.726866"
+    },
+    {
+      "test_name": "Protected Route /settings",
+      "status": "FAIL",
+      "details": "Expected 401/403, got No response",
+      "timestamp": "2026-02-21T07:37:50.727801"
+    }
+  ],
+  "timestamp": "20260221_073750"
+}
