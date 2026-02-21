@@ -982,6 +982,27 @@ async def startup_event():
     members_collection = db["members"]
     packages_collection = db["packages"]
     settings_collection = db["settings"]
+
+    if SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD:
+        existing_super = await admins_collection.find_one({"email": SUPER_ADMIN_EMAIL})
+        if existing_super:
+            await admins_collection.update_one(
+                {"_id": existing_super["_id"]},
+                {"$set": {"role": "super_admin", "verified": True, "disabled": False}}
+            )
+        else:
+            await admins_collection.insert_one({
+                "full_name": "Super Admin",
+                "email": SUPER_ADMIN_EMAIL,
+                "password_hash": hash_password(SUPER_ADMIN_PASSWORD),
+                "verified": True,
+                "role": "super_admin",
+                "disabled": False,
+                "token_version": 0,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            })
+
     scheduler.add_job(run_daily_reminders, CronTrigger(hour=9, minute=0))
     scheduler.start()
 
