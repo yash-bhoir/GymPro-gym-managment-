@@ -400,9 +400,35 @@ class GymAPITester:
         self.test_package_id = package_id
         return True
 
+    def test_cloudinary_signature(self):
+        """Test Cloudinary signature endpoint"""
+        print("\n🔍 Testing Cloudinary Signature...")
+        
+        if not self.access_token:
+            self.log_test("Cloudinary Signature", False, "No access token")
+            return False
+
+        response = self.make_request('GET', '/cloudinary/signature?resource_type=image')
+        
+        if response and response.status_code == 200:
+            signature_data = response.json()
+            required_fields = ['signature', 'timestamp', 'cloud_name', 'api_key', 'folder']
+            missing_fields = [field for field in required_fields if field not in signature_data]
+            
+            if not missing_fields:
+                self.log_test("Cloudinary Signature", True, f"Signature generated for cloud: {signature_data.get('cloud_name')}")
+                return True
+            else:
+                self.log_test("Cloudinary Signature", False, f"Missing fields: {missing_fields}")
+                return False
+        else:
+            details = response.text if response else "Request failed"
+            self.log_test("Cloudinary Signature", False, details)
+            return False
+
     def test_members_crud(self):
-        """Test member CRUD operations"""
-        print("\n🔍 Testing Member CRUD...")
+        """Test member CRUD operations with photo support"""
+        print("\n🔍 Testing Member CRUD with Photo Support...")
         
         if not self.access_token:
             self.log_test("Member CRUD", False, "No access token")
@@ -412,31 +438,65 @@ class GymAPITester:
             self.log_test("Member CRUD", False, "No package ID available")
             return False
 
-        # Create member
+        # Create member with photo and gender/payment method
         payload = {
             "full_name": "John Doe",
             "phone_number": "9876543210",
             "email": "john.doe@test.com",
             "address": "123 Test Street",
+            "gender": "Male",
             "joining_date": datetime.now().isoformat(),
             "package_id": self.test_package_id,
             "paid_amount": 1000.0,
-            "payment_method": "Cash"
+            "payment_method": "UPI",
+            "photo_url": "https://res.cloudinary.com/dufpsbkvl/image/upload/v1234567890/test-photo.jpg",
+            "photo_public_id": "test-photo"
         }
         
         response = self.make_request('POST', '/members', payload)
         if not response or response.status_code != 200:
             details = response.text if response else "Request failed"
-            self.log_test("Member Creation", False, details)
+            self.log_test("Member Creation with Photo", False, details)
             return False
         
         member_data = response.json().get("member", {})
         member_id = member_data.get("id")
         if not member_id:
-            self.log_test("Member Creation", False, "No member ID returned")
+            self.log_test("Member Creation with Photo", False, "No member ID returned")
             return False
         
-        self.log_test("Member Creation", True, f"Member created with ID: {member_id}")
+        # Verify photo fields are stored
+        if member_data.get("photo_url") == payload["photo_url"] and member_data.get("photo_public_id") == payload["photo_public_id"]:
+            self.log_test("Member Creation with Photo", True, f"Member created with photo: {member_id}")
+        else:
+            self.log_test("Member Creation with Photo", False, "Photo fields not stored correctly")
+            return False
+        
+        # Verify gender and payment method are stored
+        if member_data.get("gender") == "Male" and member_data.get("payment", {}).get("method") == "UPI":
+            self.log_test("Member Gender/Payment Method", True, "Gender and payment method stored correctly")
+        else:
+            self.log_test("Member Gender/Payment Method", False, "Gender or payment method not stored correctly")
+        
+        # Test member update with photo removal
+        update_payload = {
+            "full_name": "John Updated",
+            "gender": "Other",
+            "payment_method": "Card",
+            "photo_url": "",
+            "photo_public_id": ""
+        }
+        
+        response = self.make_request('PUT', f'/members/{member_id}', update_payload)
+        if response and response.status_code == 200:
+            updated_member = response.json().get("member", {})
+            if updated_member.get("photo_url") == "" and updated_member.get("gender") == "Other":
+                self.log_test("Member Update with Photo Removal", True, "Photo removed and fields updated")
+            else:
+                self.log_test("Member Update with Photo Removal", False, "Photo not removed or fields not updated")
+        else:
+            details = response.text if response else "Request failed"
+            self.log_test("Member Update with Photo Removal", False, details)
         
         # List members
         response = self.make_request('GET', '/members')
