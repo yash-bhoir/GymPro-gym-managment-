@@ -118,7 +118,7 @@ const SuperMembers = () => {
               onChange={(event) => setFilters({ ...filters, admin: event.target.value })}
               inputProps={{ 'data-testid': 'super-members-admin-filter' }}
             >
-              <MenuItem value="">All Admins</MenuItem>
+              <MenuItem value="" data-testid="super-members-admin-all">All Admins</MenuItem>
               {admins.map((admin) => (
                 <MenuItem key={admin.id} value={admin.id} data-testid={`super-members-admin-option-${admin.id}`}>
                   {admin.full_name}
