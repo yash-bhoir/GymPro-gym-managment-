@@ -1,0 +1,15 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  background: radial-gradient(circle at top, #f6f4ff 0%, #f1f6ff 45%, #fef6f1 100%);
+  color: #1f2233;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
