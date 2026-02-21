@@ -67,7 +67,7 @@ class GymAPITester:
             # Try to hit the login endpoint instead of /docs
             response = requests.get(f"{self.base_url}/api/auth/me", timeout=5)
             # 401 is expected without auth, means API is working
-            success = response.status_code in [401, 422, 403]
+            success = response.status_code in [401, 422]
             self.log_test("Backend Health Check", success, f"Status: {response.status_code} (API responding)")
             return success
         except Exception as e:
