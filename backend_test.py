@@ -676,27 +676,33 @@ class GymAPITester:
             return False
         
         # Test 4: Cloudinary signature (requires auth)
+        # Use super admin token for Cloudinary test
+        original_token = self.access_token
+        self.access_token = self.super_admin_token
         self.test_cloudinary_signature()
         
-        # Test 5: Super Admin Dashboard
-        if not self.test_super_dashboard_summary():
-            print("⚠️ Super admin dashboard failed")
-        
-        # Test 6: Super Admin List
-        if not self.test_super_admin_list():
-            print("⚠️ Super admin list failed")
-        
-        # Test 7: Super Members List
-        if not self.test_super_members_list():
-            print("⚠️ Super members list failed")
-        
-        # Test 8: Package CRUD (required for member tests)
+        # Test 5: Package CRUD (required for member tests)
         if not self.test_package_crud():
             print("⚠️ Package CRUD failed")
         
-        # Test 9: Members CRUD with photo support
+        # Test 6: Members CRUD with photo support
         if not self.test_members_crud():
             print("⚠️ Member CRUD failed")
+            
+        # Restore original token
+        self.access_token = original_token
+        
+        # Test 7: Super Admin Dashboard
+        if not self.test_super_dashboard_summary():
+            print("⚠️ Super admin dashboard failed")
+        
+        # Test 8: Super Admin List
+        if not self.test_super_admin_list():
+            print("⚠️ Super admin list failed")
+        
+        # Test 9: Super Members List
+        if not self.test_super_members_list():
+            print("⚠️ Super members list failed")
         
         # Test 10: Registration
         if not self.test_register_admin():
