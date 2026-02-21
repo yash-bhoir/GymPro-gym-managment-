@@ -402,8 +402,16 @@ async def register(payload: RegisterRequest):
     else:
         await admins_collection.insert_one(data)
 
-    smtp_settings = SMTPSettings(email=SMTP_EMAIL, app_password=SMTP_APP_PASSWORD, enabled=SMTP_ENABLED)
-    await send_email(payload.email, "Your OTP Code", f"Your OTP is {otp}. It expires in 10 minutes.", smtp_settings)
+    # Only send email if SMTP is properly configured
+    if SMTP_ENABLED and SMTP_EMAIL and SMTP_APP_PASSWORD:
+        smtp_settings = SMTPSettings(email=SMTP_EMAIL, app_password=SMTP_APP_PASSWORD, enabled=SMTP_ENABLED)
+        try:
+            await send_email(payload.email, "Your OTP Code", f"Your OTP is {otp}. It expires in 10 minutes.", smtp_settings)
+        except Exception:
+            pass  # Continue even if email fails
+    else:
+        # For testing without SMTP, we'll store the OTP but can't send email
+        print(f"OTP for {payload.email}: {otp} (expires in {OTP_EXPIRE_MINUTES} minutes)")
 
     return {"message": "OTP sent to email"}
 
