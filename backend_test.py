@@ -661,11 +661,12 @@ class GymAPITester:
             return False
 
 def main():
-    # Use the external backend URL from frontend .env
-    backend_url = "https://gym-admin-pro.cluster-0.preview.emergentcf.cloud"
+    # Test locally since external URL returns 403
+    backend_url = "http://localhost:8001"
     
     print("🏋️ Gym Membership Management API Testing")
     print("=" * 50)
+    print("Note: Testing locally due to external API 403 restrictions")
     
     tester = GymAPITester(backend_url)
     success = tester.run_all_tests()
