@@ -661,12 +661,12 @@ class GymAPITester:
             return False
 
 def main():
-    # Test locally since external URL returns 403
-    backend_url = "http://localhost:8001"
+    # Test with public URL now that Vite proxy is configured
+    backend_url = "https://gym-admin-pro.cluster-0.preview.emergentcf.cloud"
     
     print("🏋️ Gym Membership Management API Testing")
     print("=" * 50)
-    print("Note: Testing locally due to external API 403 restrictions")
+    print("Note: Testing with public URL via Vite proxy configuration")
     
     tester = GymAPITester(backend_url)
     success = tester.run_all_tests()
