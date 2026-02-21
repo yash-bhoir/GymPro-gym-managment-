@@ -120,7 +120,9 @@ def sanitize_admin(doc: dict) -> dict:
         "id": str(doc["_id"]),
         "full_name": doc.get("full_name"),
         "email": doc.get("email"),
-        "verified": doc.get("verified", False)
+        "verified": doc.get("verified", False),
+        "role": doc.get("role", "admin"),
+        "disabled": doc.get("disabled", False)
     }
 
 
