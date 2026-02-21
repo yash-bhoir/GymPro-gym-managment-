@@ -16,6 +16,9 @@ import Members from './pages/Members'
 import Packages from './pages/Packages'
 import Payments from './pages/Payments'
 import Settings from './pages/Settings'
+import SuperDashboard from './pages/SuperDashboard'
+import SuperAdmins from './pages/SuperAdmins'
+import SuperMembers from './pages/SuperMembers'
 
 const AppLayout = ({ title, children, mode, onToggleMode }) => {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -26,9 +29,17 @@ const AppLayout = ({ title, children, mode, onToggleMode }) => {
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }} data-testid="app-layout">
-      <Sidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
-      <Box sx={{ flexGrow: 1, width: { md: `calc(100% - 260px)` }, px: { xs: 3, md: 4 }, py: 2 }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', width: '100%' }} data-testid="app-layout">
+      <Sidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} admin={admin} />
+      <Box
+        sx={{
+          flexGrow: 1,
+          width: { md: `calc(100% - 260px)` },
+          px: { xs: 2, sm: 3, md: 4 },
+          py: { xs: 1.5, md: 2 },
+          overflowX: 'hidden'
+        }}
+      >
         <Topbar
           title={title}
           onMenuClick={handleDrawerToggle}
@@ -37,7 +48,7 @@ const AppLayout = ({ title, children, mode, onToggleMode }) => {
           admin={admin}
           onLogout={logout}
         />
-        <Box sx={{ mt: 3 }}>{children}</Box>
+        <Box sx={{ mt: { xs: 2, md: 3 } }}>{children}</Box>
       </Box>
     </Box>
   )
@@ -47,6 +58,7 @@ const App = () => {
   const { admin } = useAuth()
   const [mode, setMode] = useState(localStorage.getItem('theme_mode') || 'light')
   const theme = useMemo(() => getTheme(mode), [mode])
+  const isSuperAdmin = admin?.role === 'super_admin'
 
   const handleToggleMode = () => {
     const next = mode === 'dark' ? 'light' : 'dark'
@@ -58,7 +70,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Routes>
-        <Route path="/" element={<Navigate to={admin ? '/dashboard' : '/login'} replace />} />
+        <Route path="/" element={<Navigate to={admin ? (isSuperAdmin ? '/super-dashboard' : '/dashboard') : '/login'} replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<VerifyOtp />} />
@@ -68,9 +80,13 @@ const App = () => {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <AppLayout title="Dashboard" mode={mode} onToggleMode={handleToggleMode}>
-                <Dashboard />
-              </AppLayout>
+              {isSuperAdmin ? (
+                <Navigate to="/super-dashboard" replace />
+              ) : (
+                <AppLayout title="Dashboard" mode={mode} onToggleMode={handleToggleMode}>
+                  <Dashboard />
+                </AppLayout>
+              )}
             </ProtectedRoute>
           }
         />
@@ -78,9 +94,13 @@ const App = () => {
           path="/members"
           element={
             <ProtectedRoute>
-              <AppLayout title="Members" mode={mode} onToggleMode={handleToggleMode}>
-                <Members />
-              </AppLayout>
+              {isSuperAdmin ? (
+                <Navigate to="/super-dashboard" replace />
+              ) : (
+                <AppLayout title="Members" mode={mode} onToggleMode={handleToggleMode}>
+                  <Members />
+                </AppLayout>
+              )}
             </ProtectedRoute>
           }
         />
@@ -88,9 +108,13 @@ const App = () => {
           path="/packages"
           element={
             <ProtectedRoute>
-              <AppLayout title="Packages" mode={mode} onToggleMode={handleToggleMode}>
-                <Packages />
-              </AppLayout>
+              {isSuperAdmin ? (
+                <Navigate to="/super-dashboard" replace />
+              ) : (
+                <AppLayout title="Packages" mode={mode} onToggleMode={handleToggleMode}>
+                  <Packages />
+                </AppLayout>
+              )}
             </ProtectedRoute>
           }
         />
@@ -98,9 +122,13 @@ const App = () => {
           path="/payments"
           element={
             <ProtectedRoute>
-              <AppLayout title="Payments" mode={mode} onToggleMode={handleToggleMode}>
-                <Payments />
-              </AppLayout>
+              {isSuperAdmin ? (
+                <Navigate to="/super-dashboard" replace />
+              ) : (
+                <AppLayout title="Payments" mode={mode} onToggleMode={handleToggleMode}>
+                  <Payments />
+                </AppLayout>
+              )}
             </ProtectedRoute>
           }
         />
@@ -108,9 +136,55 @@ const App = () => {
           path="/settings"
           element={
             <ProtectedRoute>
-              <AppLayout title="Settings" mode={mode} onToggleMode={handleToggleMode}>
-                <Settings />
-              </AppLayout>
+              {isSuperAdmin ? (
+                <Navigate to="/super-dashboard" replace />
+              ) : (
+                <AppLayout title="Settings" mode={mode} onToggleMode={handleToggleMode}>
+                  <Settings />
+                </AppLayout>
+              )}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/super-dashboard"
+          element={
+            <ProtectedRoute>
+              {isSuperAdmin ? (
+                <AppLayout title="Super Dashboard" mode={mode} onToggleMode={handleToggleMode}>
+                  <SuperDashboard />
+                </AppLayout>
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/super-admins"
+          element={
+            <ProtectedRoute>
+              {isSuperAdmin ? (
+                <AppLayout title="All Admins" mode={mode} onToggleMode={handleToggleMode}>
+                  <SuperAdmins />
+                </AppLayout>
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/super-members"
+          element={
+            <ProtectedRoute>
+              {isSuperAdmin ? (
+                <AppLayout title="All Members" mode={mode} onToggleMode={handleToggleMode}>
+                  <SuperMembers />
+                </AppLayout>
+              ) : (
+                <Navigate to="/dashboard" replace />
+              )}
             </ProtectedRoute>
           }
         />
