@@ -219,10 +219,10 @@ const Members = () => {
               onChange={(event) => setFilters({ ...filters, status: event.target.value })}
               inputProps={{ 'data-testid': 'members-status-filter' }}
             >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="Active">Active</MenuItem>
-              <MenuItem value="Expired">Expired</MenuItem>
-              <MenuItem value="Cancelled">Cancelled</MenuItem>
+              <MenuItem value="" data-testid="members-status-all-option">All</MenuItem>
+              <MenuItem value="Active" data-testid="members-status-active-option">Active</MenuItem>
+              <MenuItem value="Expired" data-testid="members-status-expired-option">Expired</MenuItem>
+              <MenuItem value="Cancelled" data-testid="members-status-cancelled-option">Cancelled</MenuItem>
             </Select>
           </FormControl>
           <FormControl sx={{ minWidth: 180 }}>
