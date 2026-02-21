@@ -387,11 +387,11 @@ const Members = () => {
                 onChange={handlePaymentChange}
                 inputProps={{ 'data-testid': 'payment-method-select' }}
               >
-                <MenuItem value="Cash">Cash</MenuItem>
-                <MenuItem value="Online">Online</MenuItem>
-                <MenuItem value="UPI">UPI</MenuItem>
-                <MenuItem value="Card">Card</MenuItem>
-                <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
+                <MenuItem value="Cash" data-testid="payment-method-cash-option">Cash</MenuItem>
+                <MenuItem value="Online" data-testid="payment-method-online-option">Online</MenuItem>
+                <MenuItem value="UPI" data-testid="payment-method-upi-option">UPI</MenuItem>
+                <MenuItem value="Card" data-testid="payment-method-card-option">Card</MenuItem>
+                <MenuItem value="Bank Transfer" data-testid="payment-method-bank-transfer-option">Bank Transfer</MenuItem>
               </Select>
             </FormControl>
             <TextField label="Transaction ID" name="transaction_id" value={paymentForm.transaction_id} onChange={handlePaymentChange} fullWidth sx={{ mb: 2 }} inputProps={{ 'data-testid': 'payment-transaction-input' }} />
