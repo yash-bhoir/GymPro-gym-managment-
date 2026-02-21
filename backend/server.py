@@ -33,6 +33,8 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 SMTP_EMAIL = os.environ.get("SMTP_EMAIL")
 SMTP_APP_PASSWORD = os.environ.get("SMTP_APP_PASSWORD")
 SMTP_ENABLED = os.environ.get("SMTP_ENABLED", "false").lower() == "true"
+SUPER_ADMIN_EMAIL = os.environ.get("SUPER_ADMIN_EMAIL")
+SUPER_ADMIN_PASSWORD = os.environ.get("SUPER_ADMIN_PASSWORD")
 CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
