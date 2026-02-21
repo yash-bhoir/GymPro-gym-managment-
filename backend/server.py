@@ -99,8 +99,16 @@ def generate_otp() -> str:
 def serialize_id(doc: dict) -> dict:
     if not doc:
         return doc
-    doc["id"] = str(doc.pop("_id"))
-    return doc
+    serialized = {}
+    for key, value in doc.items():
+        if key == "_id":
+            continue
+        if isinstance(value, ObjectId):
+            serialized[key] = str(value)
+        else:
+            serialized[key] = value
+    serialized["id"] = str(doc["_id"])
+    return serialized
 
 
 def sanitize_admin(doc: dict) -> dict:
