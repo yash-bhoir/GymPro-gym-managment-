@@ -11,6 +11,7 @@ const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const googleClientId = import.meta.env.REACT_APP_GOOGLE_CLIENT_ID
 
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value })
@@ -89,7 +90,13 @@ const Login = () => {
           </Box>
           <Divider sx={{ my: 3 }}>or</Divider>
           <Box sx={{ display: 'flex', justifyContent: 'center' }} data-testid="google-login-container">
-            <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError('Google login failed')} />
+            {googleClientId ? (
+              <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError('Google login failed')} />
+            ) : (
+              <Typography variant="body2" color="text.secondary" data-testid="google-login-disabled">
+                Google sign-in requires a client ID.
+              </Typography>
+            )}
           </Box>
           <Box sx={{ mt: 3, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
