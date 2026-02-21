@@ -1,0 +1,22 @@
+{
+  "summary": {
+    "total_tests": 2,
+    "passed_tests": 1,
+    "success_rate": "50.0%"
+  },
+  "test_results": [
+    {
+      "test_name": "Backend Health Check",
+      "status": "PASS",
+      "details": "Status: 403 (API responding)",
+      "timestamp": "2026-02-21T07:37:21.062515"
+    },
+    {
+      "test_name": "Super Admin Login",
+      "status": "FAIL",
+      "details": "Request failed",
+      "timestamp": "2026-02-21T07:37:21.194191"
+    }
+  ],
+  "timestamp": "20260221_073721"
+}
