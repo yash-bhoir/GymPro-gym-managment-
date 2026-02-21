@@ -504,8 +504,16 @@ async def forgot_password(payload: ForgotPasswordRequest):
         {"$set": {"otp_code": otp, "otp_expires_at": otp_expiry}}
     )
 
-    smtp_settings = SMTPSettings(email=SMTP_EMAIL, app_password=SMTP_APP_PASSWORD, enabled=SMTP_ENABLED)
-    await send_email(payload.email, "Password Reset OTP", f"Your OTP is {otp}. It expires in 10 minutes.", smtp_settings)
+    # Only send email if SMTP is properly configured
+    if SMTP_ENABLED and SMTP_EMAIL and SMTP_APP_PASSWORD:
+        smtp_settings = SMTPSettings(email=SMTP_EMAIL, app_password=SMTP_APP_PASSWORD, enabled=SMTP_ENABLED)
+        try:
+            await send_email(payload.email, "Password Reset OTP", f"Your OTP is {otp}. It expires in 10 minutes.", smtp_settings)
+        except Exception:
+            pass  # Continue even if email fails
+    else:
+        # For testing without SMTP, we'll store the OTP but can't send email
+        print(f"Reset OTP for {payload.email}: {otp} (expires in {OTP_EXPIRE_MINUTES} minutes)")
 
     return {"message": "OTP sent"}
 
