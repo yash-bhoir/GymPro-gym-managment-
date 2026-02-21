@@ -176,6 +176,143 @@ class GymAPITester:
             self.log_test("Forgot Password", False, details)
             return False
 
+    def test_super_admin_login(self):
+        """Test super admin login with provided credentials"""
+        print("\n🔍 Testing Super Admin Login...")
+        payload = {
+            "email": "yash@prudencesoftware.com",
+            "password": "Spidy@1104"
+        }
+        
+        response = self.make_request('POST', '/auth/login', payload, auth_required=False)
+        
+        if response and response.status_code == 200:
+            data = response.json()
+            self.super_admin_token = data.get('access_token')
+            admin_info = data.get('admin', {})
+            
+            if admin_info.get('role') == 'super_admin':
+                self.log_test("Super Admin Login", True, f"Logged in as {admin_info.get('full_name')} with super_admin role")
+                return True
+            else:
+                self.log_test("Super Admin Login", False, f"Role is {admin_info.get('role')}, expected super_admin")
+                return False
+        else:
+            details = response.text if response else "Request failed"
+            self.log_test("Super Admin Login", False, details)
+            return False
+    
+    def test_super_dashboard_summary(self):
+        """Test super admin dashboard summary"""
+        print("\n🔍 Testing Super Dashboard Summary...")
+        
+        if not self.super_admin_token:
+            self.log_test("Super Dashboard Summary", False, "No super admin token")
+            return False
+
+        # Temporarily use super admin token
+        original_token = self.access_token
+        self.access_token = self.super_admin_token
+        
+        response = self.make_request('GET', '/super/summary')
+        
+        # Restore original token
+        self.access_token = original_token
+        
+        if response and response.status_code == 200:
+            summary = response.json()
+            required_fields = ['total_admins', 'total_members', 'active_members', 'expired_members', 'pending_payments', 'total_revenue', 'monthly_revenue']
+            missing_fields = [field for field in required_fields if field not in summary]
+            
+            if not missing_fields:
+                self.log_test("Super Dashboard Summary", True, f"All required fields present. Total admins: {summary.get('total_admins')}, Total members: {summary.get('total_members')}")
+                return True
+            else:
+                self.log_test("Super Dashboard Summary", False, f"Missing fields: {missing_fields}")
+                return False
+        else:
+            details = response.text if response else "Request failed"
+            self.log_test("Super Dashboard Summary", False, details)
+            return False
+    
+    def test_super_admin_list(self):
+        """Test super admin list functionality"""
+        print("\n🔍 Testing Super Admin List...")
+        
+        if not self.super_admin_token:
+            self.log_test("Super Admin List", False, "No super admin token")
+            return False
+
+        # Temporarily use super admin token
+        original_token = self.access_token
+        self.access_token = self.super_admin_token
+        
+        response = self.make_request('GET', '/super/admins', data=None)
+        
+        # Restore original token
+        self.access_token = original_token
+        
+        if response and response.status_code == 200:
+            data = response.json()
+            admins = data.get('admins', [])
+            total = data.get('total', 0)
+            self.log_test("Super Admin List", True, f"Retrieved {len(admins)} admins out of {total} total")
+            return True
+        else:
+            details = response.text if response else "Request failed"
+            self.log_test("Super Admin List", False, details)
+            return False
+    
+    def test_super_members_list(self):
+        """Test super members list functionality"""
+        print("\n🔍 Testing Super Members List...")
+        
+        if not self.super_admin_token:
+            self.log_test("Super Members List", False, "No super admin token")
+            return False
+
+        # Temporarily use super admin token
+        original_token = self.access_token
+        self.access_token = self.super_admin_token
+        
+        response = self.make_request('GET', '/super/members', data=None)
+        
+        # Restore original token
+        self.access_token = original_token
+        
+        if response and response.status_code == 200:
+            data = response.json()
+            members = data.get('members', [])
+            total = data.get('total', 0)
+            self.log_test("Super Members List", True, f"Retrieved {len(members)} members out of {total} total")
+            return True
+        else:
+            details = response.text if response else "Request failed"
+            self.log_test("Super Members List", False, details)
+            return False
+
+    def test_regular_admin_access_to_super_routes(self):
+        """Test that regular admin cannot access super admin routes"""
+        print("\n🔍 Testing Regular Admin Access to Super Routes...")
+        
+        if not self.access_token:
+            self.log_test("Regular Admin Super Access", False, "No regular admin token")
+            return False
+
+        super_routes = ['/super/summary', '/super/admins', '/super/members']
+        all_blocked = True
+        
+        for route in super_routes:
+            response = self.make_request('GET', route)
+            if response and response.status_code == 403:
+                self.log_test(f"Block Regular Access {route}", True, "Correctly blocked regular admin")
+            else:
+                all_blocked = False
+                status = response.status_code if response else "No response"
+                self.log_test(f"Block Regular Access {route}", False, f"Expected 403, got {status}")
+        
+        return all_blocked
+
     def test_login_invalid(self):
         """Test login with invalid credentials"""
         print("\n🔍 Testing Invalid Login...")
@@ -203,14 +340,15 @@ class GymAPITester:
         
         response = self.make_request('POST', '/auth/google', payload, auth_required=False)
         
-        if response and response.status_code == 400:
-            self.log_test("Google Login Without Config", True, "Correctly rejected when no client ID")
+        if response and response.status_code in [400, 401]:
+            self.log_test("Google Login Without Valid Token", True, "Correctly rejected invalid Google token")
             return True
         else:
             details = response.text if response else "Request failed"
-            self.log_test("Google Login Without Config", False, details)
+            self.log_test("Google Login Without Valid Token", False, details)
             return False
-        """Test package CRUD operations"""
+            
+    def test_package_crud(self):
         print("\n🔍 Testing Package CRUD...")
         
         if not self.access_token:
