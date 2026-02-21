@@ -583,6 +583,16 @@ async def create_member(payload: MemberCreate, current_user=Depends(get_current_
     paid_amount = payload.paid_amount
     remaining_amount = max(total_amount - paid_amount, 0)
     payment_status = "Fully Paid" if remaining_amount == 0 else ("Partially Paid" if paid_amount > 0 else "Pending")
+    payment_history = []
+
+    if paid_amount > 0:
+        payment_history.append({
+            "amount": paid_amount,
+            "method": payload.payment_method,
+            "transaction_id": None,
+            "payment_date": datetime.utcnow(),
+            "note": "Initial payment"
+        })
 
     member = {
         "full_name": payload.full_name,
@@ -605,7 +615,7 @@ async def create_member(payload: MemberCreate, current_user=Depends(get_current_
             "status": payment_status,
             "method": payload.payment_method
         },
-        "payment_history": [],
+        "payment_history": payment_history,
         "created_by": current_user["_id"],
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow()
