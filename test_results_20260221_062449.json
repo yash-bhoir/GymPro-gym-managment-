@@ -1,0 +1,22 @@
+{
+  "summary": {
+    "total_tests": 2,
+    "passed_tests": 1,
+    "success_rate": "50.0%"
+  },
+  "test_results": [
+    {
+      "test_name": "Backend Health Check",
+      "status": "PASS",
+      "details": "Status: 200",
+      "timestamp": "2026-02-21T06:24:48.912419"
+    },
+    {
+      "test_name": "Admin Registration",
+      "status": "FAIL",
+      "details": "Request failed",
+      "timestamp": "2026-02-21T06:24:49.230567"
+    }
+  ],
+  "timestamp": "20260221_062449"
+}
