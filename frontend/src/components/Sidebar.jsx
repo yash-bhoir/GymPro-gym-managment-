@@ -1,15 +1,17 @@
 import React from 'react'
-import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Box, Typography } from '@mui/material'
+import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Box, Typography, Chip } from '@mui/material'
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined'
 import { NavLink } from 'react-router-dom'
 
 const drawerWidth = 260
 
-const navItems = [
+const adminNav = [
   { label: 'Dashboard', icon: <DashboardOutlinedIcon />, path: '/dashboard', testId: 'nav-dashboard-link' },
   { label: 'Members', icon: <PeopleAltOutlinedIcon />, path: '/members', testId: 'nav-members-link' },
   { label: 'Packages', icon: <Inventory2OutlinedIcon />, path: '/packages', testId: 'nav-packages-link' },
@@ -17,13 +19,25 @@ const navItems = [
   { label: 'Settings', icon: <SettingsOutlinedIcon />, path: '/settings', testId: 'nav-settings-link' }
 ]
 
-const Sidebar = ({ mobileOpen, onClose }) => {
+const superNav = [
+  { label: 'Super Dashboard', icon: <DashboardOutlinedIcon />, path: '/super-dashboard', testId: 'nav-super-dashboard-link' },
+  { label: 'All Admins', icon: <AdminPanelSettingsOutlinedIcon />, path: '/super-admins', testId: 'nav-super-admins-link' },
+  { label: 'All Members', icon: <GroupsOutlinedIcon />, path: '/super-members', testId: 'nav-super-members-link' }
+]
+
+const Sidebar = ({ mobileOpen, onClose, admin }) => {
+  const isSuperAdmin = admin?.role === 'super_admin'
+  const navItems = isSuperAdmin ? superNav : adminNav
+
   const drawerContent = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', px: 2 }}>
       <Toolbar sx={{ px: 0 }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700 }} data-testid="sidebar-brand-title">GymPulse</Typography>
           <Typography variant="body2" color="text.secondary" data-testid="sidebar-brand-subtitle">Membership Suite</Typography>
+          {isSuperAdmin && (
+            <Chip label="Super Admin" color="secondary" size="small" sx={{ mt: 1 }} data-testid="sidebar-super-admin-chip" />
+          )}
         </Box>
       </Toolbar>
       <List sx={{ mt: 2 }}>
