@@ -677,22 +677,31 @@ async def update_member(member_id: str, payload: MemberUpdate, current_user=Depe
 
     update_data = {k: v for k, v in payload.dict().items() if v is not None}
 
-    if "package_id" in update_data:
-        package = await packages_collection.find_one({"_id": parse_object_id(update_data["package_id"]), "created_by": current_user["_id"]})
+    if "payment_method" in update_data:
+        update_data["payment.method"] = update_data.pop("payment_method")
+
+    updated_paid_amount = update_data.get("paid_amount", member.get("payment", {}).get("paid_amount", 0))
+    total_amount = member.get("payment", {}).get("total_amount", 0)
+
+    if "package_id" in update_data or "joining_date" in update_data:
+        package_id = update_data.get("package_id") or str(member.get("package_id"))
+        package = await packages_collection.find_one({"_id": parse_object_id(package_id), "created_by": current_user["_id"]})
         if not package:
             raise HTTPException(status_code=404, detail="Package not found")
         start_date = update_data.get("joining_date") or member.get("joining_date")
+        total_amount = package["price"]
+        update_data["package_id"] = package["_id"]
         update_data["package_name"] = package["name"]
         update_data["start_date"] = start_date
         update_data["end_date"] = start_date + timedelta(days=package["duration_days"])
-        update_data["payment.total_amount"] = package["price"]
+        update_data["payment.total_amount"] = total_amount
 
-    if "paid_amount" in update_data:
-        paid_amount = update_data["paid_amount"]
-        total_amount = member["payment"]["total_amount"]
-        remaining = max(total_amount - paid_amount, 0)
-        status_value = "Fully Paid" if remaining == 0 else ("Partially Paid" if paid_amount > 0 else "Pending")
-        await members_collection.update_one({"_id": member["_id"]}, {"$set": {"payment.paid_amount": paid_amount, "payment.remaining_amount": remaining, "payment.status": status_value}})
+    if "paid_amount" in update_data or "package_id" in update_data or "joining_date" in update_data:
+        remaining = max(total_amount - updated_paid_amount, 0)
+        status_value = "Fully Paid" if remaining == 0 else ("Partially Paid" if updated_paid_amount > 0 else "Pending")
+        update_data["payment.paid_amount"] = updated_paid_amount
+        update_data["payment.remaining_amount"] = remaining
+        update_data["payment.status"] = status_value
         update_data.pop("paid_amount", None)
 
     if update_data:
