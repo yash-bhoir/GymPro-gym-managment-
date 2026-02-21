@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from time import sleep
 
 class GymAPITester:
-    def __init__(self, base_url="http://localhost:8001"):
+    def __init__(self, base_url="https://gym-admin-pro.cluster-0.preview.emergentcf.cloud"):
         self.base_url = base_url
         self.access_token = None
         self.refresh_token = None
