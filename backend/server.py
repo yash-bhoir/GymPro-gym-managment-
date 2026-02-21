@@ -946,10 +946,20 @@ async def run_daily_reminders():
 
 @app.on_event("startup")
 async def startup_event():
+    global client, db, admins_collection, members_collection, packages_collection, settings_collection
+    client = AsyncIOMotorClient(MONGO_URL)
+    db = client[DB_NAME]
+    admins_collection = db["admins"]
+    members_collection = db["members"]
+    packages_collection = db["packages"]
+    settings_collection = db["settings"]
     scheduler.add_job(run_daily_reminders, CronTrigger(hour=9, minute=0))
     scheduler.start()
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    scheduler.shutdown()
+    if scheduler.running:
+        scheduler.shutdown()
+    if client:
+        client.close()
